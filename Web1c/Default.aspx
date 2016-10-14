@@ -27,7 +27,7 @@
              <asp:Label ID="Password_Label" AssociatedControlId="Password_Input" runat="server" Text="Label">密碼</asp:Label>
          </td>
          <td>
-             <asp:TextBox ID="Password_Input" runat="server"></asp:TextBox>
+             <asp:TextBox ID="Password_Input" runat="server" TextMode="Password"></asp:TextBox>
              <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server"         
                                     ErrorMessage="Incorrect Password Format，請不要輸入非英文數字之文字" 
                                     ControlToValidate="Password_Input"         
@@ -46,10 +46,10 @@
              尚未登入或帳號密碼錯誤
          </EmptyDataTemplate>
          <Fields>
-             <asp:BoundField DataField="Web_Account" HeaderText="Web_Account" SortExpression="Web_Account" />
-             <asp:BoundField DataField="Web_Password" HeaderText="Web_Password" SortExpression="Web_Password" />
-             <asp:BoundField DataField="Web_Points" HeaderText="Web_Points" SortExpression="Web_Points" />
-             <asp:BoundField DataField="Web_Email" HeaderText="Web_Email" SortExpression="Web_Email" />
+             <asp:BoundField DataField="Web_Account" HeaderText="帳號名稱" SortExpression="Web_Account" />
+             <asp:BoundField DataField="Web_Password" HeaderText="密碼" SortExpression="Web_Password" Visible="False" />
+             <asp:BoundField DataField="Web_Points" HeaderText="點數" SortExpression="Web_Points" />
+             <asp:BoundField DataField="Web_Email" HeaderText="E-Mail地址" SortExpression="Web_Email" />
          </Fields>
      </asp:DetailsView>
      <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:Web1cConnectionString %>" SelectCommand="SELECT [Web_Account], [Web_Password], [Web_Points], [Web_Email] FROM [Table]" onselecting="SqlDataSource1_Selecting">

@@ -51,7 +51,7 @@ namespace Web1c
             string password = Password_Input.Text.Length != 0 ? Password_Input.Text : " ";
             // if the user trying to login , we add "where" to the select query 
             // modify the command to add where 
-            e.Command.CommandText += " WHERE ([Web_Account] = @Web_Account) AND ([Web_Account] = @Web_Account) ";
+            e.Command.CommandText += " WHERE ([Web_Account] = @Web_Account) AND ([Web_Password] = @Web_Password) ";
             SqlParameter account_query = new SqlParameter("@Web_Account", account);
             e.Command.Parameters.Add(account_query);
             SqlParameter password_query = new SqlParameter("@Web_Password", password);  
@@ -61,6 +61,7 @@ namespace Web1c
         protected void Logout_Input_Click(object sender, EventArgs e)
         {
             loginStatus = 0;
+            Login_Input.Visible = true;
         }
     }
 }
