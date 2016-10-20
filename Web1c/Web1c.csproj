@@ -71,6 +71,13 @@
     <Content Include="App_Data\Database1_log.ldf">
       <DependentUpon>Database1.mdf</DependentUpon>
     </Content>
+    <Content Include="DrinkShop.aspx" />
+    <Content Include="Images\drinks\no-image-icon-6.png" />
+    <Content Include="Images\drinks\可可.jpg" />
+    <Content Include="Images\drinks\奶茶.jpg" />
+    <Content Include="Images\drinks\紅茶.jpg" />
+    <Content Include="Images\drinks\綠茶.jpg" />
+    <Content Include="Images\drinks\薑茶.jpg" />
     <Content Include="Images\FreeVectorDrinks.jpg" />
     <Content Include="Images\PDP_Coca-Cola_HFCS_glass_8oz.png" />
     <Content Include="Styles\Site.css" />
@@ -129,6 +136,13 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DrinkShop.aspx.cs">
+      <DependentUpon>DrinkShop.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DrinkShop.aspx.designer.cs">
+      <DependentUpon>DrinkShop.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

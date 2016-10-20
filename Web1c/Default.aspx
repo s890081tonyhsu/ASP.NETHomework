@@ -35,8 +35,10 @@
          </td>
      </tr>
  </table>
-      <asp:button ID="Login_Input" runat="server" text="登入" onclick="Login_Input_Click" />
+     <asp:button ID="Login_Input" runat="server" text="登入" onclick="Login_Input_Click" />
      <asp:Button ID="Logout_Input" runat="server" OnClick="Logout_Input_Click" Text="登出" />
+     <asp:Button ID="EnterStore_Input" runat="server" PostBackUrl="~/DrinkShop.aspx" Text="進入商店" Visible="False"></asp:Button>
+     <br>
      <asp:Label ID="loginStatusLabel" runat="server"></asp:Label>
      <asp:Label ID="Yield_Label" runat="server" Text="WTF"></asp:Label>
      <br />

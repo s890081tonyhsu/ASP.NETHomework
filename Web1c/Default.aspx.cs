@@ -23,25 +23,27 @@ namespace Web1c
         {
             DetailsView1.DataBind(); //更新detailView
             loginStatus = (DetailsView1.DataItemCount == 1) ? 2 : 1;
+            DetailsView1.Visible = (loginStatus & 2) == 2;
+            Login_Input.Visible = (loginStatus & 2) == 0;
+            Logout_Input.Visible = (loginStatus & 2) == 2;
+            EnterStore_Input.Visible = (loginStatus & 2) == 2;
             switch (loginStatus)
             {
                 case 2:
                     loginStatusLabel.Text = "你已經登入，以下是你的會員資料";
-                    DetailsView1.Visible = true;
-                    Login_Input.Visible = false;
-                    Logout_Input.Visible = true;
+                    Session["Web_Account"] = DetailsView1.Rows[0].Cells[1].Text;
+                    Session["Web_Points"] = DetailsView1.Rows[2].Cells[1].Text;
                     break;
                 case 1:
                     loginStatusLabel.Text = "你輸入了錯誤的帳號或密碼";
-                    DetailsView1.Visible = false;
-                    Login_Input.Visible = true;
-                    Logout_Input.Visible = false;
                     break;
                 default:
                     loginStatusLabel.Text = "";
-                    DetailsView1.Visible = false;
-                    Login_Input.Visible = true;
-                    Logout_Input.Visible = false;
+                    if (Session["Web_Account"] != null)
+                    {
+                        Session.Remove("Web_Account");
+                        Session.Remove("Web_Points");
+                    }
                     break;
             }
         }
