@@ -32,6 +32,7 @@ namespace Web1c
                 case 2:
                     loginStatusLabel.Text = "你已經登入，以下是你的會員資料";
                     Session["Web_Account"] = DetailsView1.Rows[0].Cells[1].Text;
+                    Session["Web_Password"] = DetailsView1.Rows[1].Cells[1].Text;
                     Session["Web_Points"] = DetailsView1.Rows[2].Cells[1].Text;
                     break;
                 case 1:
