@@ -43,7 +43,7 @@
      <asp:Label ID="Yield_Label" runat="server" Text="WTF"></asp:Label>
      <br />
      <br />
-     <asp:DetailsView ID="DetailsView1" runat="server" AutoGenerateRows="False" DataSourceID="SqlDataSource1" Height="20px" Width="573px">
+     <asp:DetailsView ID="UserDetailView" runat="server" AutoGenerateRows="False" Height="20px" Width="573px">
          <EmptyDataTemplate>
              尚未登入或帳號密碼錯誤
          </EmptyDataTemplate>
@@ -54,8 +54,6 @@
              <asp:BoundField DataField="Web_Email" HeaderText="E-Mail地址" SortExpression="Web_Email" />
          </Fields>
      </asp:DetailsView>
-     <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:Web1cConnectionString %>" SelectCommand="SELECT [Web_Account], [Web_Password], [Web_Points], [Web_Email] FROM [Table]" onselecting="SqlDataSource1_Selecting">
-     </asp:SqlDataSource>
 </form>
 
 </div>
