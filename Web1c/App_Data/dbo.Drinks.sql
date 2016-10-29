@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Drink] (
+﻿CREATE TABLE [dbo].[Drinks] (
     [drink_id]    INT          IDENTITY (1, 1) NOT NULL,
     [drink_name]  NVARCHAR(50) DEFAULT ((0)) NOT NULL,
     [drink_price] INT          DEFAULT ((0)) NOT NULL,

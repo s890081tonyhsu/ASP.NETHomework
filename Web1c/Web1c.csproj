@@ -71,6 +71,10 @@
     <Content Include="App_Data\Database1_log.ldf">
       <DependentUpon>Database1.mdf</DependentUpon>
     </Content>
+    <Content Include="App_Data\dbo.Drinks.sql" />
+    <Content Include="App_Data\dbo.OrderDrinks.sql" />
+    <Content Include="App_Data\dbo.Orders.sql" />
+    <Content Include="App_Data\dbo.Users.sql" />
     <Content Include="DrinkShop.aspx" />
     <Content Include="Images\drinks\no-image-icon-6.png" />
     <Content Include="Images\drinks\可可.jpg" />

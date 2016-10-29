@@ -11,7 +11,7 @@
         <asp:Button ID="BackToDefault" runat="server" style="float: right;" PostBackUrl="~/Default.aspx" Text="返回個人頁面" />
 
     </div>
-    <div>
+    <asp:Panel ID="OrderDrinks_SelectDrinks_Panel" runat="server">
         <asp:DropDownList ID="DrinkName_Dropdown" runat="server" AutoPostBack="True" 
             Height="30px" Width="167px" 
             OnSelectedIndexChanged="DrinkName_Dropdown_SelectedIndexChanged" 
@@ -25,7 +25,73 @@
         <br />
         <asp:Button ID="Order_New" runat="server" OnClick="Order_New_Click" Text="訂購此飲料" />
         <asp:Label ID="Order_New_Msg" runat="server"></asp:Label>
-    </div>
+        <br />
+        <br />
+        </asp:Panel>
+        <asp:Panel ID="OrderDrinks_Porperty_Panel" runat="server" Visible="False">
+            要訂購
+        <asp:DropDownList ID="OrderDrinks_no_dropdown" runat="server">
+            <asp:ListItem Selected="True">0</asp:ListItem>
+            <asp:ListItem>1</asp:ListItem>
+            <asp:ListItem>2</asp:ListItem>
+            <asp:ListItem>3</asp:ListItem>
+            <asp:ListItem>4</asp:ListItem>
+            <asp:ListItem>5</asp:ListItem>
+            <asp:ListItem>6</asp:ListItem>
+            <asp:ListItem>7</asp:ListItem>
+            <asp:ListItem>8</asp:ListItem>
+            <asp:ListItem>9</asp:ListItem>
+            <asp:ListItem>10</asp:ListItem>
+        </asp:DropDownList>
+        杯，甜度
+
+     
+        <asp:DropDownList ID="OrderDrinks_sweet_dropdown" runat="server">
+            <asp:ListItem Value="-1">未知</asp:ListItem>
+            <asp:ListItem Value="0">無糖</asp:ListItem>
+            <asp:ListItem Value="1">1分甜</asp:ListItem>
+            <asp:ListItem Value="2">3分甜</asp:ListItem>
+            <asp:ListItem Value="3">半糖</asp:ListItem>
+            <asp:ListItem Value="4">7分甜</asp:ListItem>
+            <asp:ListItem Value="5">全糖</asp:ListItem>
+        </asp:DropDownList>
+        ，冰塊
+     
+        <asp:DropDownList ID="OrderDrinks_ice_dropdown" runat="server">
+            <asp:ListItem Value="-1">未知</asp:ListItem>
+            <asp:ListItem Value="0">去冰</asp:ListItem>
+            <asp:ListItem Value="1">少冰</asp:ListItem>
+            <asp:ListItem Value="2">加冰</asp:ListItem>
+        </asp:DropDownList>
+        。
+        <asp:Button ID="orderdrink_Item_Insert_Button" runat="server" Text="插入此項目" OnClick="OrderDrinks_Item_Insert_Button_Click" />
+        <br />
+        <br />
+        <br />
+        <asp:GridView ID="OrderDrinks_GridView" runat="server" AutoGenerateColumns="False">
+            <Columns>
+                <asp:BoundField DataField="drink_name" HeaderText="名稱" SortExpression="drink_name" />
+                <asp:BoundField DataField="orderdrink_no" HeaderText="數量" SortExpression="orderdrink_no" />
+                <asp:TemplateField HeaderText="甜度" SortExpression="orderdrink_sweet">
+                    <ItemTemplate>
+                        <asp:Label ID="OrderDrink_Template_sweet_label" runat="server" Text='<%# formatColumnData("sweet", Convert.ToInt32(Eval("orderdrink_sweet"))) %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="冰度" SortExpression="orderdrink_ice">
+                    <ItemTemplate>
+                        <asp:Label ID="OrderDrink_Template_ice_label" runat="server" Text='<%# formatColumnData("ice", Convert.ToInt32(Eval("orderdrink_ice"))) %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:BoundField DataField="orderdrink_total_price" HeaderText="總價" SortExpression="orderdrink_total_price" />
+            </Columns>
+        </asp:GridView>
+        <br />
+        <asp:Label ID="OrderDrinks_total_label" runat="server"></asp:Label>
+            <br />
+            <asp:Button ID="CheckBuy_Button" runat="server" OnClick="CheckBuy_Button_Click" Text="送交訂單" />
+            <asp:Button ID="CancelBuy_Button" runat="server" Text="取消訂單" OnClick="CancelBuy_Button_Click" />
+    </asp:Panel>
+    <asp:Label ID="Order_status_label" runat="server"></asp:Label>
     </form>
 </body>
 </html>
