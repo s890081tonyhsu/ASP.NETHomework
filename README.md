@@ -22,6 +22,8 @@ After clone to the new place, you need to settle up the following tables in "Web
 	./Web1c/App_Data/dbo.Table.sql // for account and password
 	./Web1c/App_Data/dbo.Drink.sql // for drink names and price
 	./Web1c/App_Data/dbo.Order.sql // for ordering the drinks
+	./Web1c/App_Data/dbo.OrderDrinks.sql // for listing all drinks in the order, catogoried by order\_id
+```
 
 Point the port at 9601 by following instruction below the link.
 
