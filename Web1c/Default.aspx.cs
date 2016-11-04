@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
 using System.Data.SqlClient;
+using NLog;
 
 namespace Web1c
 {
@@ -15,6 +16,7 @@ namespace Web1c
         SqlConnection Conn = null;
         static string Web1cConnectionString = "Data Source=127.0.0.1,9061;Initial Catalog=Web1c;Integrated Security=True";
         public int loginStatus = 0;
+        private static Logger logger = NLog.LogManager.GetCurrentClassLogger();
         protected void Page_Load(object sender, EventArgs e)
         {
             Conn = new SqlConnection(Web1cConnectionString);
@@ -81,6 +83,7 @@ namespace Web1c
             }
             catch (SqlException sqlE)
             {
+                logger.Error(sqlE);
                 Response.Write("<script>window.alert('無法進行登入')</script>");
             }
             finally
