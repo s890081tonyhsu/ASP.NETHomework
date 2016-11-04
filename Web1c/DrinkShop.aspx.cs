@@ -222,5 +222,30 @@ namespace Web1c
                 Conn.Close();
             }
         }
+
+        protected void OrderDrinks_Gridview_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+
+        }
+
+        protected void OrderDrinks_Gridview_RowEditing(object sender, GridViewEditEventArgs e)
+        {
+
+        }
+
+        protected void OrderDrinks_Gridview_RowUpdating(object sender, GridViewUpdateEventArgs e)
+        {
+
+        }
+
+        protected void OrderDrinks_Gridview_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+
+        }
+
+        protected void OrderDrinks_Gridview_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+        {
+
+        }
     }
 }
