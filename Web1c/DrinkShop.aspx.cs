@@ -113,7 +113,7 @@ namespace Web1c
             try
             {
                 Conn.Open();
-                da.SelectCommand = new SqlCommand("SELECT OrderDrinks.orderdrink_count, OrderDrinks.orderdrink_drink_id, OrderDrinks.orderdrink_no, OrderDrinks.orderdrink_sweet, OrderDrinks.orderdrink_ice, Drinks.drink_price * OrderDrinks.orderdrink_no AS orderdrink_total_price FROM Drinks INNER JOIN OrderDrinks ON Drinks.drink_id = OrderDrinks.orderdrink_drink_id WHERE OrderDrinks.orderdrink_order_id = @orderdrink_order_id", Conn);
+                da.SelectCommand = new SqlCommand("SELECT OrderDrinks.orderdrink_count, OrderDrinks.orderdrink_drink_id, OrderDrinks.orderdrink_no, OrderDrinks.orderdrink_sweet, OrderDrinks.orderdrink_ice, Drinks.drink_price * OrderDrinks.orderdrink_no AS orderdrink_item_price FROM Drinks INNER JOIN OrderDrinks ON Drinks.drink_id = OrderDrinks.orderdrink_drink_id WHERE OrderDrinks.orderdrink_order_id = @orderdrink_order_id", Conn);
                 da.SelectCommand.Parameters.AddWithValue("@orderdrink_order_id", Session["order_id"]);
                 da.Fill(ds, "OrderDrinks_with_Price"); //執行select
                 ds.Tables["OrderDrinks_with_Price"].PrimaryKey = new DataColumn[] { ds.Tables["OrderDrinks_with_Price"].Columns["orderdrink_count"] };
@@ -130,7 +130,6 @@ namespace Web1c
         }
         protected void OrderDrinks_Item_GridViewSet()
         {
-            OrderDrinks_total_label.Text = "共有" + ds.Tables["OrderDrinks_with_Price"].Rows.Count + "筆資料";
             OrderDrinks_GridView.DataSource = ds;
             OrderDrinks_GridView.DataMember = "OrderDrinks_with_Price";
             OrderDrinks_GridView.DataBind();            
@@ -164,7 +163,7 @@ namespace Web1c
         protected string formatColumnData(string type, int n)
         {
             string res = "未知";
-            string[] sweet = { "1分甜", "3分甜", "半糖", "7分甜", "全糖" };
+            string[] sweet = { "無糖", "1分甜", "3分甜", "半糖", "7分甜", "全糖" };
             string[] ice = { "去冰", "少冰", "加冰" };
             if (n == -1) return res;
             if (type == "sweet") return sweet[n];
@@ -267,14 +266,16 @@ namespace Web1c
 
         protected void OrderDrinks_Gridview_RowEditing(object sender, GridViewEditEventArgs e)
         {
-            OrderDrinks_GridView.EditIndex = e.NewEditIndex;
             OrderDrinks_Item_Dataset();
+            OrderDrinks_GridView.EditIndex = e.NewEditIndex;
+            OrderDrinks_Item_GridViewSet();
         }
 
         protected void OrderDrinks_Gridview_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
         {
-            OrderDrinks_GridView.EditIndex = -1;
             OrderDrinks_Item_Dataset();
+            OrderDrinks_GridView.EditIndex = -1;
+            OrderDrinks_Item_GridViewSet();
         }
 
         protected void OrderDrinks_Gridview_RowUpdating(object sender, GridViewUpdateEventArgs e)
@@ -282,8 +283,7 @@ namespace Web1c
             try
             {
                 GridViewRow row = OrderDrinks_GridView.Rows[e.RowIndex];
-                DropDownList orderdrink_drink_id, orderdrink_no, orderdrink_sweet, orderdrink_ice;
-                orderdrink_drink_id = (row.FindControl("OrderDrink_Template_drink_name_dropdown") as DropDownList);
+                DropDownList orderdrink_no, orderdrink_sweet, orderdrink_ice;
                 orderdrink_no = (row.FindControl("OrderDrink_Template_no_dropdown") as DropDownList);
                 orderdrink_sweet = (row.FindControl("OrderDrink_Template_sweet_dropdown") as DropDownList);
                 orderdrink_ice = (row.FindControl("OrderDrink_Template_ice_dropdown") as DropDownList);
@@ -292,14 +292,14 @@ namespace Web1c
                 logger.Info("Index at: "+Convert.ToInt32(e.RowIndex));
                 string orderdrink_count = ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_count"].ToString();
                 Conn.Open();
-                da.UpdateCommand = new SqlCommand("UPDATE OrderDrinks SET orderdrink_no = @orderdrink_no, orderdrink_drink_id = @orderdrink_drink_id, orderdrink_sweet = @orderdrink_sweet, orderdrink_ice = @orderdrink_ice WHERE orderdrink_count = @orderdrink_count", Conn);
+                da.UpdateCommand = new SqlCommand("UPDATE OrderDrinks SET orderdrink_no = @orderdrink_no, orderdrink_sweet = @orderdrink_sweet, orderdrink_ice = @orderdrink_ice WHERE orderdrink_count = @orderdrink_count", Conn);
                 da.UpdateCommand.Parameters.AddWithValue("@orderdrink_count", orderdrink_count);
-                da.UpdateCommand.Parameters.AddWithValue("@orderdrink_drink_id", orderdrink_drink_id.SelectedValue.ToString());
+                //da.UpdateCommand.Parameters.AddWithValue("@orderdrink_drink_id", orderdrink_drink_id.SelectedValue.ToString());
                 da.UpdateCommand.Parameters.AddWithValue("@orderdrink_no", orderdrink_no.SelectedValue.ToString());
                 da.UpdateCommand.Parameters.AddWithValue("@orderdrink_sweet", orderdrink_sweet.SelectedValue.ToString());
                 da.UpdateCommand.Parameters.AddWithValue("@orderdrink_ice", orderdrink_ice.SelectedValue.ToString());
 
-                ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_drink_id"] = orderdrink_drink_id.SelectedValue.ToString();
+                //ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_drink_id"] = orderdrink_drink_id.SelectedValue.ToString();
                 ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_no"] = orderdrink_no.SelectedValue.ToString();
                 ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_sweet"] = orderdrink_sweet.SelectedValue.ToString();
                 ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_ice"] = orderdrink_ice.SelectedValue.ToString();
@@ -315,27 +315,21 @@ namespace Web1c
             {
                 Conn.Close();
                 OrderDrinks_Item_Dataset();
+                OrderDrinks_GridView.EditIndex = -1;
+                OrderDrinks_Item_GridViewSet();
             }
         }
 
         protected void OrderDrinks_Gridview_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            if (e.Row.RowType == DataControlRowType.DataRow)
-            {
-                if ((e.Row.RowState & DataControlRowState.Edit) > 0)
-                {
-                    DropDownList orderdrink_template_drink_id_dropdown = (DropDownList)OrderDrinks_GridView.Rows[e.Row.DataItemIndex].FindControl("OrderDrink_Template_drink_id_dropdown");
-                    // bind DropDown manually
-                    orderdrink_template_drink_id_dropdown.DataValueField = "drink_id";
-                    orderdrink_template_drink_id_dropdown.DataTextField = "drink_name";
+            
+            int sum = 0;
 
-                    orderdrink_template_drink_id_dropdown.DataSource = ds.Tables["Drinks"].DefaultView;
-                    orderdrink_template_drink_id_dropdown.DataBind();
-                    var item = new ListItem("請選擇飲料", "0");
-                    orderdrink_template_drink_id_dropdown.Items.Insert(0, item);
-                    orderdrink_template_drink_id_dropdown.SelectedValue = e.Row.DataItem.ToString(); // you can use e.Row.DataItem to get the value
-                }
+            for (int i = 0; i < ds.Tables["OrderDrinks_with_Price"].Rows.Count; i++)
+            {
+                sum += Convert.ToInt32(ds.Tables["OrderDrinks_with_Price"].Rows[i]["orderdrink_item_price"].ToString());
             }
+            OrderDrinks_total_label.Text = "共有" + ds.Tables["OrderDrinks_with_Price"].Rows.Count + "筆項目，總共 " + sum + " 元";
         }
     }
 }
