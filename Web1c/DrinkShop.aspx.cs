@@ -17,29 +17,43 @@ namespace Web1c
         SqlDataAdapter da = new SqlDataAdapter(); // for OrderDrinks
         SqlConnection Conn = new SqlConnection(Web1cConnectionString);
         private static Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        public bool order_session;
         protected void Page_Load(object sender, EventArgs e)
         {
             if(Session["User_Account"] == null) Response.Redirect("./Default.aspx");
-            SessionName.Text = Session["User_Account"] + "歡迎光臨";
-            SessionPoints.Text = "目前你還有" + Session["User_Points"] + "元";
+            SessionName.Text = Session["User_Account"].ToString();
+            SessionPoints.Text = Session["User_Points"] + "元";
+            order_session = (Session["order_id"] != null);
+            logger.Warn("order_session = " + order_session.ToString());
+            Drinks_Item_Dataset();
+
+            DrinkName_Dropdown.DataValueField = "drink_id";
+            DrinkName_Dropdown.DataTextField = "drink_name";
+
+            DrinkName_Dropdown.DataSource = ds;
+            DrinkName_Dropdown.DataMember = "Drinks";
+
+            if (!IsPostBack)
+            {
+                DrinkName_Dropdown.DataBind();
+                DrinkName_Dropdown.Items.Insert(0, new ListItem("請選擇飲料", ""));
+            }
+            string DrinkName_Dropdown_menu_list = "";
+            foreach(ListItem item in DrinkName_Dropdown.Items)
+            {
+                if(item.Value != "")DrinkName_Dropdown_menu_list += "<div class='item' data-value="+item.Value+">"+item.Text+"</div>";
+            }
+            DrinkName_Dropdown_menu.InnerHtml = DrinkName_Dropdown_menu_list;
+            ChangeVisibleState();
+        }
+        protected void Drinks_Item_Dataset()
+        {
             try
             {
                 Conn.Open();
-
-                SqlDataAdapter da = new SqlDataAdapter("SELECT drink_id, drink_name, drink_price FROM Drinks ORDER BY drink_id", Conn);
+                SqlDataAdapter da = new SqlDataAdapter("SELECT drink_id, drink_name, drink_price, drink_qt FROM Drinks ORDER BY drink_id", Conn);
                 da.Fill(ds, "Drinks");
                 ds.Tables["Drinks"].PrimaryKey = new DataColumn[] { ds.Tables["Drinks"].Columns["drink_id"] };
-
-                DrinkName_Dropdown.DataValueField = "drink_id";
-                DrinkName_Dropdown.DataTextField = "drink_name";
-
-                DrinkName_Dropdown.DataSource = ds.Tables["Drinks"].DefaultView;
-                if (!IsPostBack)
-                {
-                    DrinkName_Dropdown.DataBind();
-                    ListItem item = new ListItem("請選擇飲料", "0");
-                    DrinkName_Dropdown.Items.Insert(0, item);
-                }
             }
             catch (SqlException sqlE)
             {
@@ -49,9 +63,8 @@ namespace Web1c
             finally
             {
                 Conn.Close();
-            }  
+            }
         }
-
         protected void DrinkName_Dropdown_SelectedIndexChanged(object sender, EventArgs e)
         {
             string drink_id = DrinkName_Dropdown.SelectedItem.Value;
@@ -60,18 +73,17 @@ namespace Web1c
             {
                 string drink_name = findSelected["drink_name"].ToString();
                 string drink_price = findSelected["drink_price"].ToString();
-                DrinkName_Show.Text = "你選擇的是" + drink_name + "，";
-                DrinkPrice_Show.Text = "每杯" + drink_price + "元";
+                DrinkName_Show.Text = drink_name;
+                DrinkPrice_Show.Text = drink_price + "元/杯";
                 Drink_Image.ImageUrl = "./Images/drinks/" + drink_name + ".jpg";
                 Drink_Image.Visible = true;
             }
             else
             {
-                DrinkName_Show.Text = "你沒有選擇飲料";
+                DrinkName_Show.Text = "你尚未選擇飲料";
                 DrinkPrice_Show.Text = "";
                 Drink_Image.Visible = false;
             }
-            Order_New.Enabled = true;
             Order_New_Msg.Text = "";
         }
 
@@ -91,10 +103,8 @@ namespace Web1c
                 dr = cmd.ExecuteReader(); //執行select
                 dr.Read();
                 Session["order_id"] = dr["order_id"];
-                Order_New_Msg.Text = "訂單已建立，這是第" + dr["order_id"] + "號訂單";
-                Session["order_id"] = dr["order_id"];
-                Order_New.Enabled = false;
-                OrderDrinks_Porperty_Panel.Visible = true;
+                order_session = true;
+                Order_New_Msg.Text = "第" + Session["order_id"] + "號訂單";
                 Order_status_label.Text = "";
             }
             catch (SqlException sqlE)
@@ -106,6 +116,7 @@ namespace Web1c
             {
                 Conn.Close();
                 OrderDrinks_Item_Dataset();
+                ChangeVisibleState();
             }
         }
         protected void OrderDrinks_Item_Dataset()
@@ -160,7 +171,7 @@ namespace Web1c
                 OrderDrinks_Item_GridViewSet();
             }
         }
-        protected string formatColumnData(string type, int n)
+        protected string FormatColumnData(string type, int n)
         {
             string res = "未知";
             string[] sweet = { "無糖", "1分甜", "3分甜", "半糖", "7分甜", "全糖" };
@@ -175,8 +186,70 @@ namespace Web1c
             }
             return res;
         }
-
         protected void CheckBuy_Button_Click(object sender, EventArgs e)
+        {
+            if(User_Money_and_Drink_Qt_Check()) SuccessBuy_Command();
+            else CancelBuy_Button_Click(sender, e);
+        }
+        protected bool User_Money_and_Drink_Qt_Check()
+        {
+            bool qtyTest = true;
+            Dictionary<int, int> DrinkQtyDict = new Dictionary<int, int>();
+            int drink_id, drink_qt;
+            Drinks_Item_Dataset();
+            OrderDrinks_Item_Dataset();
+            for (int i = 0; i < ds.Tables["Drinks"].Rows.Count; i++) DrinkQtyDict.Add(Convert.ToInt32(ds.Tables["Drinks"].Rows[i]["drink_id"]), Convert.ToInt32(ds.Tables["Drinks"].Rows[i]["drink_qt"]));
+
+            int sum = 0, user_points = Convert.ToInt32(Session["User_Points"]);
+
+            for (int i = 0; i < ds.Tables["OrderDrinks_with_Price"].Rows.Count; i++)
+            {
+                drink_id = Convert.ToInt32(ds.Tables["OrderDrinks_with_Price"].Rows[i]["orderdrink_drink_id"].ToString());
+                drink_qt = Convert.ToInt32(ds.Tables["OrderDrinks_with_Price"].Rows[i]["orderdrink_no"]);
+                sum += Convert.ToInt32(ds.Tables["OrderDrinks_with_Price"].Rows[i]["orderdrink_item_price"].ToString());
+                DrinkQtyDict[drink_id] -= drink_qt;
+                if(DrinkQtyDict[drink_id] < 0) qtyTest = false;
+            }
+
+            if(user_points < sum) return false;
+            if (!qtyTest) return false;
+
+            user_points -= sum;
+            Session["User_Points"] = user_points.ToString();
+            SessionPoints.Text = Session["User_Points"] + "元";
+
+            try
+            {
+                Conn.Open();
+                SqlCommand cmd = new SqlCommand("UPDATE Users SET User_Points = @User_Points WHERE (User_Account = @User_Account) AND (User_Password = @User_Password)", Conn);
+                SqlParameter account_query = new SqlParameter("@User_Account", Session["User_Account"]);
+                cmd.Parameters.Add(account_query);
+                SqlParameter password_query = new SqlParameter("@User_Password", Session["User_Password"]);
+                cmd.Parameters.Add(password_query);
+                SqlParameter point_query = new SqlParameter("@User_Points", user_points);
+                cmd.Parameters.Add(point_query);
+                cmd.ExecuteNonQuery();
+
+                foreach (KeyValuePair<int, int> entry in DrinkQtyDict)
+                {
+                    cmd = new SqlCommand("UPDATE Drinks SET drink_qt = @drink_qt WHERE drink_id = @drink_id", Conn);
+                    cmd.Parameters.AddWithValue("@drink_id", entry.Key);
+                    cmd.Parameters.AddWithValue("@drink_qt", entry.Value);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (SqlException sqlE)
+            {
+                logger.Error(sqlE);
+                Response.Write("<script>window.alert('扣款失敗')</script>");
+            }
+            finally
+            {
+                Conn.Close();
+            }
+            return true;
+        }
+        protected void SuccessBuy_Command()
         {
             try
             {
@@ -186,10 +259,9 @@ namespace Web1c
                 cmd.Parameters.AddWithValue("@order_user_pass", Session["User_Password"].ToString());
 
                 cmd.ExecuteNonQuery();
-                Order_status_label.Text = "你的訂單已經送出";
-                Order_New.Enabled = true;
-                OrderDrinks_Porperty_Panel.Visible = false;
                 Session.Remove("order_id");
+                order_session = false;
+                Order_status_label.Text = "你的訂單已經送出";
                 Order_New_Msg.Text = "";
             }
             catch (SqlException sqlE)
@@ -200,6 +272,7 @@ namespace Web1c
             finally
             {
                 Conn.Close();
+                ChangeVisibleState();
             }
         }
 
@@ -213,10 +286,9 @@ namespace Web1c
                 cmd.Parameters.AddWithValue("@order_user_pass", Session["User_Password"].ToString());
 
                 cmd.ExecuteNonQuery();
-                Order_status_label.Text = "你的訂單已經取消";
-                Order_New.Enabled = true;
-                OrderDrinks_Porperty_Panel.Visible = false;
                 Session.Remove("order_id");
+                order_session = false;
+                Order_status_label.Text = "你的訂單已經取消";
                 Order_New_Msg.Text = "";
             }
             catch (SqlException sqlE)
@@ -227,6 +299,7 @@ namespace Web1c
             finally
             {
                 Conn.Close();
+                ChangeVisibleState();
             }
         }
 
@@ -330,6 +403,15 @@ namespace Web1c
                 sum += Convert.ToInt32(ds.Tables["OrderDrinks_with_Price"].Rows[i]["orderdrink_item_price"].ToString());
             }
             OrderDrinks_total_label.Text = "共有" + ds.Tables["OrderDrinks_with_Price"].Rows.Count + "筆項目，總共 " + sum + " 元";
+        }
+
+        protected void ChangeVisibleState()
+        {
+            Order_New.CssClass = order_session ? "ui fluid red disabled button":"ui fluid red button";
+            Order_New_Msg.Visible = order_session & IsPostBack;
+            OrderDrinks_Order_Panel.Visible = order_session;
+            OrderDrinks_Porperty_Panel.Visible = order_session;
+            Order_status_label.Visible = !order_session & IsPostBack;
         }
     }
 }

@@ -1,0 +1,28 @@
+﻿body {
+    background-color: #FFFFFF;
+}
+.ui.logo {
+    width: 20px;
+}
+.ui.menu .item img.logo {
+    margin-right: 1.5em;
+}
+.main.container {
+    margin-top: 7em;
+}
+h1.ui.header{
+    margin-bottom: 2em;
+}
+.wireframe {
+    margin-top: 2em;
+}
+.ui.footer.segment {
+    margin: 5em 0em 0em;
+    padding: 5em 0em;
+}
+.column.ui.form{
+  padding-top: 2.5em;
+}
+#MainContent_Drink_Image{
+  max-height: 321px;
+}

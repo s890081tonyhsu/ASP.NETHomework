@@ -16,13 +16,15 @@ namespace Web1c
         SqlConnection Conn = null;
         static string Web1cConnectionString = "Data Source=127.0.0.1,9061;Initial Catalog=Web1c;Integrated Security=True";
         public int loginStatus = 0;
+        public string msgBoxClass = "ui message row ";
         private static Logger logger = NLog.LogManager.GetCurrentClassLogger();
         protected void Page_Load(object sender, EventArgs e)
         {
             Conn = new SqlConnection(Web1cConnectionString);
+            loginMessage.Visible = false;
+            User_Detail_Tab.Visible = false;
+            User_Detail_Seg.Visible = false;
             loginStatusLabel.Text = "";
-            UserDetailView.Visible = false;
-            Logout_Input.Visible = false;
             Yield_Label.Text = "";
             if (Session["User_Account"] != null || Session["User_Password"] != null)
             {
@@ -38,22 +40,26 @@ namespace Web1c
             UserDetailView.DataSource = ds.Tables["Users"];
             UserDetailView.DataBind(); // 到這時候detailsview才能拿到資料
             loginStatus = (UserDetailView.DataItemCount == 1) ? 2 : 1;
-            UserDetailView.Visible = (loginStatus & 2) == 2;
-            Login_Input.Visible = (loginStatus & 2) == 0;
-            Logout_Input.Visible = (loginStatus & 2) == 2;
-            EnterStore_Input.Visible = (loginStatus & 2) == 2;
+            Login_Form.Visible = (loginStatus & 2) == 0;
+            User_Detail_Tab.Visible = (loginStatus & 2) == 2;
+            User_Detail_Seg.Visible = (loginStatus & 2) == 2;
             switch (loginStatus)
             {
                 case 2:
+                    loginMessage.Visible = true;
+                    loginMessage.Attributes["class"] = msgBoxClass + "success";
                     loginStatusLabel.Text = "你已經登入，以下是你的會員資料";
                     Session["User_Account"] = ds.Tables["Users"].Rows[0]["User_Account"];
                     Session["User_Password"] = ds.Tables["Users"].Rows[0]["User_Password"];
                     Session["User_Points"] = ds.Tables["Users"].Rows[0]["User_Points"];
                     break;
                 case 1:
+                    loginMessage.Visible = true;
+                    loginMessage.Attributes["class"] = msgBoxClass + "error";
                     loginStatusLabel.Text = "你輸入了錯誤的帳號或密碼";
                     break;
                 default:
+                    loginMessage.Visible = false;
                     loginStatusLabel.Text = "";
                     if (Session["User_Account"] != null)
                     {
@@ -95,12 +101,12 @@ namespace Web1c
         protected void Logout_Input_Click(object sender, EventArgs e)
         {
             loginStatus = 0;
-            Login_Input.Visible = true;
-            UserDetailView.Visible = (loginStatus & 2) == 2;
-            Login_Input.Visible = (loginStatus & 2) == 0;
-            Logout_Input.Visible = (loginStatus & 2) == 2;
-            EnterStore_Input.Visible = (loginStatus & 2) == 2;
-            loginStatusLabel.Text = "";
+            Login_Form.Visible = (loginStatus & 2) == 0;
+            User_Detail_Tab.Visible = (loginStatus & 2) == 2;
+            User_Detail_Seg.Visible = (loginStatus & 2) == 2;
+            loginMessage.Visible = true;
+            loginMessage.Attributes["class"] = msgBoxClass + "success";
+            loginStatusLabel.Text = "恭喜你，你已經成功完成登出";
             if (Session["User_Account"] != null)
             {
                 Session.Remove("User_Account");

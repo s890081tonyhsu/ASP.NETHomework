@@ -80,6 +80,7 @@
     <Content Include="App_Data\dbo.Orders.sql" />
     <Content Include="App_Data\dbo.Users.sql" />
     <Content Include="DrinkShop.aspx" />
+    <Content Include="Images\logo.png" />
     <Content Include="Images\drinks\no-image-icon-6.png" />
     <Content Include="Images\drinks\可可.jpg" />
     <Content Include="Images\drinks\奶茶.jpg" />
@@ -91,6 +92,7 @@
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\site.js" />
+    <Content Include="Styles\site.css" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -176,9 +178,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Styles\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
