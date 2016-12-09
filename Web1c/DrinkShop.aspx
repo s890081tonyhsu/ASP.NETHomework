@@ -158,6 +158,16 @@
                         </EditItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="名稱" SortExpression="drink_name">
+                        <EditItemTemplate>
+                            <div class="ui dropdown selection" tabindex="0">
+                                <asp:DropDownList ID="OrderDrink_Template_drink_id_dropdown" runat="server">
+                                </asp:DropDownList>
+                                <i class="dropdown icon"></i>
+                                <div class="default text">飲料名稱</div>
+                                <div class="menu transition hidden" tabindex="-1" id="OrderDrink_Template_drink_id_dropdown">
+                                </div>
+                            </div>
+                        </EditItemTemplate>
                         <ItemTemplate>
                             <asp:Label ID="OrderDrink_Template_drink_id_label" runat="server" Text='<%# FormatColumnData("name", Convert.ToInt32(Eval("orderdrink_drink_id"))) %>'></asp:Label>
                         </ItemTemplate>

@@ -39,7 +39,18 @@
     return false;
 }
 
+function load_drink_names()
+{
+    if($('#MainContent_OrderDrinks_GridView_OrderDrink_Template_drink_id_dropdown_0').length == 0) return;
+    appendStr = '';
+    $('#MainContent_OrderDrinks_GridView_OrderDrink_Template_drink_id_dropdown_0').children('option').each(function(){
+        appendStr = appendStr + '<div class="item" data-value="'+$(this).val()+'">'+$(this).text()+'</div>';
+    });
+    $('#OrderDrink_Template_drink_id_dropdown').append(appendStr);
+}
+
 $(document).ready(function ()
 {
+    load_drink_names();
     $(".ui.dropdown").dropdown();
 });

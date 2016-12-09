@@ -356,7 +356,8 @@ namespace Web1c
             try
             {
                 GridViewRow row = OrderDrinks_GridView.Rows[e.RowIndex];
-                DropDownList orderdrink_no, orderdrink_sweet, orderdrink_ice;
+                DropDownList orderdrink_drink_id, orderdrink_no, orderdrink_sweet, orderdrink_ice;
+                orderdrink_drink_id = (row.FindControl("OrderDrink_Template_drink_id_dropdown") as DropDownList);
                 orderdrink_no = (row.FindControl("OrderDrink_Template_no_dropdown") as DropDownList);
                 orderdrink_sweet = (row.FindControl("OrderDrink_Template_sweet_dropdown") as DropDownList);
                 orderdrink_ice = (row.FindControl("OrderDrink_Template_ice_dropdown") as DropDownList);
@@ -365,14 +366,14 @@ namespace Web1c
                 logger.Info("Index at: "+Convert.ToInt32(e.RowIndex));
                 string orderdrink_count = ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_count"].ToString();
                 Conn.Open();
-                da.UpdateCommand = new SqlCommand("UPDATE OrderDrinks SET orderdrink_no = @orderdrink_no, orderdrink_sweet = @orderdrink_sweet, orderdrink_ice = @orderdrink_ice WHERE orderdrink_count = @orderdrink_count", Conn);
+                da.UpdateCommand = new SqlCommand("UPDATE OrderDrinks SET orderdrink_drink_id = @orderdrink_drink_id, orderdrink_no = @orderdrink_no, orderdrink_sweet = @orderdrink_sweet, orderdrink_ice = @orderdrink_ice WHERE orderdrink_count = @orderdrink_count", Conn);
                 da.UpdateCommand.Parameters.AddWithValue("@orderdrink_count", orderdrink_count);
-                //da.UpdateCommand.Parameters.AddWithValue("@orderdrink_drink_id", orderdrink_drink_id.SelectedValue.ToString());
+                da.UpdateCommand.Parameters.AddWithValue("@orderdrink_drink_id", orderdrink_drink_id.SelectedValue.ToString());
                 da.UpdateCommand.Parameters.AddWithValue("@orderdrink_no", orderdrink_no.SelectedValue.ToString());
                 da.UpdateCommand.Parameters.AddWithValue("@orderdrink_sweet", orderdrink_sweet.SelectedValue.ToString());
                 da.UpdateCommand.Parameters.AddWithValue("@orderdrink_ice", orderdrink_ice.SelectedValue.ToString());
 
-                //ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_drink_id"] = orderdrink_drink_id.SelectedValue.ToString();
+                ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_drink_id"] = orderdrink_drink_id.SelectedValue.ToString();
                 ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_no"] = orderdrink_no.SelectedValue.ToString();
                 ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_sweet"] = orderdrink_sweet.SelectedValue.ToString();
                 ds.Tables["OrderDrinks_with_Price"].Rows[e.RowIndex]["orderdrink_ice"] = orderdrink_ice.SelectedValue.ToString();
@@ -395,7 +396,22 @@ namespace Web1c
 
         protected void OrderDrinks_Gridview_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            
+            if(e.Row.RowType == DataControlRowType.DataRow)
+            {
+                if((e.Row.RowState & DataControlRowState.Edit) > 0)
+                {
+                    DropDownList drink_id_list = (DropDownList)e.Row.FindControl("OrderDrink_Template_drink_id_dropdown");
+
+                    Drinks_Item_Dataset();
+                    drink_id_list.DataSource = ds.Tables["drinks"];
+                    drink_id_list.DataTextField = "drink_name";
+                    drink_id_list.DataValueField = "drink_id";
+                    drink_id_list.DataBind();
+
+                    DataRowView dr = e.Row.DataItem as DataRowView;
+                    drink_id_list.SelectedValue = dr["orderdrink_drink_id"].ToString();
+                }
+            }
             int sum = 0;
 
             for (int i = 0; i < ds.Tables["OrderDrinks_with_Price"].Rows.Count; i++)
